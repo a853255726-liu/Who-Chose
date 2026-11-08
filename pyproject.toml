@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "whochose"
+version = "0.1.2"
+description = "Local, evidence-linked implementation choice reviews for Codex"
+requires-python = ">=3.11"
+dependencies = ["mcp>=1.30,<2"]
+
+[project.scripts]
+whochose = "whochose.cli:main"
+whochose-mcp = "whochose.server:main"
+
+[tool.setuptools.packages.find]
+include = ["whochose*"]
+
+[tool.setuptools.package-data]
+whochose = ["templates/*.html", "templates/*.js"]

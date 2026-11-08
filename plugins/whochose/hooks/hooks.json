@@ -1,0 +1,8 @@
+{
+  "description": "Source template. whochose package resolves the interpreter and Windows command for manual installation.",
+  "hooks": {
+    "UserPromptSubmit": [{"hooks": [{"type": "command", "command": "python -B \"${PLUGIN_ROOT}/hooks/hook_runner.py\"", "timeout": 5, "statusMessage": "WhoChose: 绑定本次用户原话"}]}],
+    "PostToolUse": [{"matcher": ".*", "hooks": [{"type": "command", "command": "python -B \"${PLUGIN_ROOT}/hooks/hook_runner.py\"", "timeout": 5, "statusMessage": "WhoChose: 观察改动线索"}]}],
+    "Stop": [{"hooks": [{"type": "command", "command": "python -B \"${PLUGIN_ROOT}/hooks/hook_runner.py\"", "timeout": 8, "statusMessage": "WhoChose: 检查本次变化是否已说明"}]}]
+  }
+}

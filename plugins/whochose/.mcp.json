@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "whochose": {
+      "command": "python",
+      "args": ["-B", "-m", "whochose.server"],
+      "env": {"PYTHONUTF8": "1", "PYTHONIOENCODING": "utf-8"}
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "whochose",
+  "version": "0.1.2",
+  "description": "按功能审阅本次 AI 实现的重要选择、来源和真实代码位置。",
+  "mcpServers": "./.mcp.json",
+  "hooks": "./hooks/hooks.json",
+  "skills": "./skills/",
+  "requires_local_executor": true,
+  "interface": {
+    "displayName": "WhoChose",
+    "shortDescription": "看懂 AI 实现中的重要选择及其来源",
+    "developerName": "WhoChose",
+    "category": "Developer Tools",
+    "capabilities": ["Read", "Write"]
+  }
+}

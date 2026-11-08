@@ -1,0 +1,29 @@
+# Local environment and generated files
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+# Development, experiments and runtime data stay local
+tests/
+checks/
+scripts/
+work/
+phase0/
+data/
+.buildchoice_audit/
+.whochose/
+*.sqlite3*
+*.db
+*.log
+whochose-review.html
+whochose-review.md
+.env
+.env.*
+# Local settings and credentials
+.codex/
+.agents/
+.aws/
