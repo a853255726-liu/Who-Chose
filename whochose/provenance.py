@@ -5,22 +5,60 @@ from pathlib import Path
 from .changes import read_code
 
 
+def _message_turn_id(turn_id, prompt):
+    """Separate a native question reply from its still-running host turn.
+
+    This only identifies a Hook-observed message; it does not validate an
+    answer's meaning or establish acceptance of an AI proposal.
+    """
+    opening = "<send_user_message_question_reply>"
+    closing = "</send_user_message_question_reply>"
+    envelope = prompt.strip()
+    if not (envelope.startswith(opening) and envelope.endswith(closing)):
+        return turn_id
+    try:
+        replies = json.loads(envelope[len(opening):-len(closing)])
+        if not isinstance(replies, list) or not replies:
+            return turn_id
+        question_ids = []
+        for reply in replies:
+            if (not isinstance(reply, dict)
+                    or not all(isinstance(reply.get(key), str)
+                               for key in ("questionItemId", "question", "answer"))):
+                return turn_id
+            item = json.loads(reply["questionItemId"])
+            if (not isinstance(item, list) or len(item) != 3
+                    or item[0] != "request_user_input_async"
+                    or not isinstance(item[1], str) or not item[1].strip()
+                    or type(item[2]) is not int or item[2] < 0):
+                return turn_id
+            question_ids.append(encode(item))
+        if len(set(question_ids)) != len(question_ids):
+            return turn_id
+    except (ValueError, TypeError, RecursionError):
+        return turn_id
+    # Use question identity, not answer content: a rewritten answer must still
+    # conflict rather than silently acquiring a new trusted message reference.
+    return "native-reply:" + digest(encode([turn_id, sorted(question_ids)]))
+
+
 def observe_user_message(store, event):
     require(event.get("hook_event_name") == "UserPromptSubmit" and not event.get("stop_hook_active")
             and not event.get("is_synthetic"), "UNVERIFIED_MESSAGE", "Only actual UserPromptSubmit callbacks can bind messages")
     for key in ("cwd", "session_id", "turn_id", "prompt"):
         text(event.get(key), key, 100000 if key == "prompt" else 2000)
     prompt = event["prompt"].replace("\r\n", "\n").replace("\r", "\n")
+    message_turn = _message_turn_id(event["turn_id"], prompt)
     with store.transaction() as db:
         wid, _ = store.workspace(db, event["cwd"])
         old = db.execute("SELECT * FROM hook_messages WHERE workspace_id=? AND session_id=? AND turn_id=?",
-                         (wid, event["session_id"], event["turn_id"])).fetchone()
+                         (wid, event["session_id"], message_turn)).fetchone()
         sha = digest(prompt)
         if old:
             require(old["digest"] == sha, "HOST_TURN_REUSED", "Host turn changed its prompt")
             return {"message_id": old["id"], "message_digest": sha, "excerpt_truncated": old["length"] > 4000}
         mid = ident("message")
-        db.execute("INSERT INTO hook_messages VALUES(?,?,?,?,?,?,?,?,?)", (mid, wid, event["session_id"], event["turn_id"],
+        db.execute("INSERT INTO hook_messages VALUES(?,?,?,?,?,?,?,?,?)", (mid, wid, event["session_id"], message_turn,
                    sha, prompt[:4000], len(prompt), now(), "local_host_hook"))
         prior_task = db.execute("SELECT t.status FROM hook_state h JOIN tasks t ON t.id=h.task_id WHERE h.workspace_id=? AND h.session_id=?",
                                 (wid, event["session_id"])).fetchone()

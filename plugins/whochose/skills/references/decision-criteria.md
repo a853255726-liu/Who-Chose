@@ -1,5 +1,16 @@
 # Shared WhoChose criteria
 
+## Review the implemented function
+
+- Start with the user's intended task and explain the actual delivered behavior: in what situation, what the user does, what happens, and any material limitation. Organize functional blocks by user tasks such as “重复录入提醒” or “删除与恢复”.
+- Write decision titles and consequences in user-facing terms. For example, “疑似重复时默认取消，明确选择后仍可保存” describes a behavior the user can review. Function names, flags, helper methods, validation layers, and class boundaries belong in implementation evidence.
+- A code design deserves a separate DECISION only when it makes a material difference to user operations, results, data/recovery, permissions, cost, or a consequential constraint. Explain that effect and the meaningful alternative. Ordinary implementation mechanisms that support the same behavior are ORDINARY_CHANGE or evidence for the functional decision; do not invent a separate product choice for each mechanism.
+- Group the code supporting one functional behavior across files and layers. Preserve separate records when behavior, source, consequence, or risk materially differs; functional grouping must not erase provenance or hide important choices.
+- In the final feedback, lead with what the user can now do and how it behaves. Then state important deviations or unrequested behavior, the specific behavior checked, and any concrete remaining gap affecting use. Keep test counts, coverage bookkeeping, function signatures, and code design out of the lead. Do not add a mandatory review round or claim that recorded coverage proves the function meets the user's goal.
+- Keep code locations, versions, source attribution, reasons, and evidence limits available as supporting detail. Simplifying the feedback must not invent user acceptance, change the source class, or upgrade code reading into runtime verification. A guidance-only change should be reported as a change to review instructions, not proof that future reviews already follow them.
+
+## Evidence and recording boundaries
+
 - Track only actual additions/changes in this task. A requirement that was never implemented belongs in user decisions, not the implementation result.
 - DECISION changes scope, core user flow, data/recovery/sharing, privacy/permissions, real cost or a consequential technical constraint. State a meaningful alternative difference. Unrecoverable deletion and unsolicited monthly statistics are decisions.
 - ORDINARY_CHANGE includes corner radius, spacing, variable renames and behavior-preserving refactors. Group these under the functional block's collapsed “其他调整”; do not invent motives or major decisions for them.
