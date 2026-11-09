@@ -8,6 +8,7 @@
 - Group the code supporting one functional behavior across files and layers. Preserve separate records when behavior, source, consequence, or risk materially differs; functional grouping must not erase provenance or hide important choices.
 - In the final feedback, lead with what the user can now do and how it behaves. Then state important deviations or unrequested behavior, the specific behavior checked, and any concrete remaining gap affecting use. Keep test counts, coverage bookkeeping, function signatures, and code design out of the lead. Do not add a mandatory review round or claim that recorded coverage proves the function meets the user's goal.
 - Keep code locations, versions, source attribution, reasons, and evidence limits available as supporting detail. Simplifying the feedback must not invent user acceptance, change the source class, or upgrade code reading into runtime verification. A guidance-only change should be reported as a change to review instructions, not proof that future reviews already follow them.
+- Keep technical code locations out of normal HTML/Markdown review presentation. Preserve the actual local associations for on-demand lookup by task ID and functional name. Routine supersession notices stay out of card text; internal revision history remains intact for all source classes.
 
 ## Evidence and recording boundaries
 
@@ -17,6 +18,7 @@
 - USER_SPECIFIED requires a matching observed explicit requirement/confirmation or a verified citation to applicable project documentation. Project requirements retain authority but use PROJECT_DOCUMENT provenance, not current-chat personal confirmation. An AI proposal accepted by the user retains proposal_origin=AI. Delegation does not approve the selected implementation.
 - AI_SUPPLEMENTED requires actual development evidence of an AI choice. Not finding a user message is insufficient. UNKNOWN is a valid, visible gray category.
 - A contemporaneous reason is a reason actually recorded during development, with its captured time. Missing reasons say “开发时未记录理由”; retrospective analysis is labeled as such.
+- Record a short reason when making an important AI tradeoff, including the relevant constraint and meaningful cost where applicable. Recording a selection's AI origin and recording its reason are separate obligations. Missing-reason warnings are quality reminders after saving, not permission checks; preserve truthful MISSING/RETROSPECTIVE states and do not manufacture reasons for old records.
 - Code-inferred consequences say “根据实现推断”. RUNTIME_VERIFIED requires an actual recorded run, not a file link or a model assertion.
 - Do not merge choices with different sources, consequences or risk; keep all source and hunk references on legitimate merges. High-impact choices cannot be cut by a card limit.
 - Coverage is a minimum diff check, not semantic completeness. Unavailable baseline, excluded files, stale code and unexplained hunks remain visible limitations.

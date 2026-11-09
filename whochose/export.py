@@ -37,19 +37,17 @@ def markdown(data):
         lines.extend(["## " + md_text(block["name"]), ""])
         for item in block["decisions"]:
             lines.extend(["### " + md_text(item["title"]), "", md_text(item["label"]), "", md_text(item["reason"]), "",
-                md_text(item["impact"]), "", md_text(item["detail_label"]) + "：" + md_text(item["detail"]), ""])
-            for code in item.get("code_refs", []):
-                lines.extend(["关联代码：" + md_text(code["location"]) + "（" + md_text(code["note"]) + "）", ""])
+                md_text(item["impact"]), ""])
+            if item["detail"]:
+                lines.extend([md_text(item["detail_label"]) + "：" + md_text(item["detail"]), ""])
         if block["ordinary_changes"]:
             lines.extend(["<details><summary>其他调整</summary>", ""])
             for group in block["ordinary_changes"]:
                 lines.append("- " + md_text(group["category"]) + "：" + md_text("；".join(group["summaries"])))
-                for code in group["code_refs"]:
-                    lines.append("  关联代码：" + md_text(code["location"]) + "（" + md_text(code["note"]) + "）")
             lines.extend(["", "</details>", ""])
     if not data["blocks"]:
         lines.extend(["本次检查范围内没有已记录且仍适用的实现选择。", ""])
-    lines.extend([md_text(data["limitation"]), ""])
+    lines.extend(["可凭任务编号和功能名称查询具体改动。", "", md_text(data["limitation"]), ""])
     return "\n".join(lines)
 
 

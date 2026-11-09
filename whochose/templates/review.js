@@ -15,32 +15,6 @@ function button(className, text, action) {
   const node = el('button', className, text); node.type = 'button';
   node.addEventListener('click', action); return node;
 }
-function codes(refs) {
-  const box = el('div');
-  for (const ref of refs) {
-    const row = el('div', 'code-row'); row.append(el('span', 'code-label', '关联代码'));
-    const feedback = el('div', 'code-feedback'); feedback.setAttribute('role', 'status'); feedback.hidden = true;
-    if (ref.can_copy) {
-      const copy = button('code-link', ref.location + ' · 复制位置', async () => {
-        let copied = false;
-        try { if (navigator.clipboard?.writeText) { await navigator.clipboard.writeText(ref.location); copied = true; } } catch (_) {}
-        if (!copied) {
-          const text = el('textarea'); text.value = ref.location; text.setAttribute('readonly', '');
-          text.style.position = 'fixed'; text.style.opacity = '0'; document.body.append(text);
-          text.select(); try { copied = document.execCommand('copy'); } catch (_) {} text.remove(); copy.focus();
-        }
-        feedback.textContent = (copied ? '已复制：' : '未能自动复制，请手动复制：') + ref.location + '。此操作复制位置，不会打开编辑器。';
-        feedback.hidden = false;
-      });
-      copy.title = '复制真实文件与行号；没有验证编辑器跳转'; row.append(copy);
-    } else {
-      row.append(el('span', 'code-link unavailable', ref.location));
-      feedback.textContent = ref.note; feedback.hidden = false;
-    }
-    box.append(row, feedback);
-  }
-  return box;
-}
 function card(item) {
   const open = state.expanded === item.id, category = type(item.source_class);
   const article = el('article', 'card' + (open ? ' expanded' : ''));
@@ -54,9 +28,10 @@ function card(item) {
   if (open) {
     const region = el('div', 'expanded-region');
     for (const [label, value] of [['对使用体验的影响', item.impact], [item.detail_label, item.detail]]) {
+      if (!value) continue;
       const section = el('div'); section.append(el('div', 'detail-label', label), el('div', 'detail-text', value)); region.append(section);
     }
-    region.append(codes(item.code_refs)); article.append(region);
+    article.append(region);
   }
   return article;
 }
@@ -91,11 +66,11 @@ function render() {
     for (const change of group.ordinary_changes) {
       const section = el('div', 'ordinary-section'); section.append(el('div', 'detail-label', change.category), el('div', 'detail-text', change.summaries.join('；')));
       if (change.exclusions.length) section.append(el('p', 'detail-text', '排除说明：' + change.exclusions.join('；')));
-      section.append(codes(change.code_refs)); ordinary.append(section);
+      ordinary.append(section);
     }
     $('cards').append(ordinary);
   }
-  $('report-meta').textContent = '任务 ' + report.task_id + ' · 生成于 ' + report.generated_at + ' · 检查范围：' + report.scope.join('、') + '。' + (report.excluded_path_count ? '已按规则排除 ' + report.excluded_path_count + ' 个私密或生成路径。' : '') + report.limitation;
+  $('report-meta').textContent = '任务 ' + report.task_id + ' · 生成于 ' + report.generated_at + ' · 检查范围：' + report.scope.join('、') + '。可凭任务编号和功能名称查询具体改动。' + (report.excluded_path_count ? '已按规则排除 ' + report.excluded_path_count + ' 个私密或生成路径。' : '') + report.limitation;
 }
 $('mobile-select').addEventListener('change', e => { state.group = e.target.value; state.expanded = null; render(); });
 render();
