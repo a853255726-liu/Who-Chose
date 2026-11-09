@@ -43,7 +43,7 @@ def source_description(data):
     if source == "AI_SUPPLEMENTED":
         origin = data["rationale_origin"]
         reason = data["rationale"] if origin == "CONTEMPORANEOUS" else "开发时未记录理由。" if origin == "MISSING" else "开发时理由未记录；下面是事后分析。"
-        detail = ("开发阶段记录的理由：" + data["rationale"]) if origin == "CONTEMPORANEOUS" else "开发时未记录理由。"
+        detail = ("开发阶段记录的理由：" + data["rationale"]) if origin == "CONTEMPORANEOUS" else ""
         if origin == "RETROSPECTIVE":
             detail += "事后分析（不代表当时动机）：" + data["rationale"]
         return LABELS[source], reason, "为什么这样选择", detail
@@ -93,8 +93,6 @@ def report(store, task_id, include_details=True):
                 "meaningful_difference": data["meaningful_difference"], "consequence_basis": data["consequence_basis"],
                 "rationale_origin": data["rationale_origin"], "rationale_captured_at": data["rationale_captured_at"],
                 "code_refs": codes, "supersedes": data["supersedes"], "code_current": current}
-            if data["supersedes"]:
-                item["detail"] += "\n本次已替代此决定的上一版本；旧版本保留在本地记录中。"
             if any(c["record_id"] == row["decision_id"] for c in checked.get("source_conflicts", [])):
                 project = data.get("user_confirmation") == "PROJECT_DOCUMENT"
                 item["reason"] = ("引用的项目说明或要求记录已有变化，适用性需复核。" if project else
@@ -133,8 +131,8 @@ def report(store, task_id, include_details=True):
     gaps = []
     if checked["counts"]["UNREVIEWED"]:
         gaps.append(f"还有 {checked['counts']['UNREVIEWED']} 处变化未说明")
-    if checked["uninspected"] or checked["baseline_state"] == "PARTIAL_BASELINE":
-        gaps.append("部分起始基线或文件无法检查")
+    if checked["uninspected"]:
+        gaps.append(f"有 {len(checked['uninspected'])} 个文件未检查")
     if stale:
         gaps.append(f"{len(stale)} 条开发记录的代码已变化，需补记")
     if checked.get("source_conflicts"):

@@ -84,6 +84,7 @@ def save(store, task_id, batch, hunk_refs, key):
     available = {h["hunk_id"]: h for h in current["hunks"]}
     linked = set()
     result_records = []
+    warnings = []
     with store.transaction() as db:
         task = store.task(db, task_id)
         replay, sha = store.replay(db, task_id, "save_implementation_choices", key, payload)
@@ -173,6 +174,10 @@ def save(store, task_id, batch, hunk_refs, key):
                     "runtime_evidence_refs": runtime_refs, "semantic_verified": False,
                     "supersedes": {"record_id": rid, "revision": revision - 1} if old else None}
                 db.execute("INSERT INTO decision_revisions VALUES(?,?,?,?,?,?)", (rid, revision, task_id, block_id, encode(data), now()))
+                if source == "AI_SUPPLEMENTED" and rationale_origin == "MISSING":
+                    warnings.append({"code": "AI_RATIONALE_MISSING", "record_id": rid, "revision": revision,
+                        "behavior_key": behavior,
+                        "message": "选择已保存，但缺少开发时理由。仅补记真实已有的依据；事后解释应标为 RETROSPECTIVE，确实未记录时保留 MISSING。"})
                 classification = "DECISION_LINKED"
             for code in codes:
                 db.execute("INSERT INTO code_links VALUES(?,?,?,?,?)", (ident("code"), task_id, rid, revision, encode(code)))
@@ -180,7 +185,7 @@ def save(store, task_id, batch, hunk_refs, key):
                 db.execute("INSERT INTO hunk_links VALUES(?,?,?,?,?)", (ref, rid, revision, classification, entry.get("exclusion_reason")))
             result_records.append({"record_id": rid, "revision": revision, "kind": kind, "validation": "references_valid_semantics_agent_interpreted"})
         require(linked == set(hunk_refs), "UNASSIGNED_HUNK_REFS", "Every supplied hunk ref must belong to at least one entry")
-        result = {"records": result_records, "replayed": False, "semantic_verified": False}
+        result = {"records": result_records, "replayed": False, "semantic_verified": False, "warnings": warnings}
         store.remember(db, task_id, "save_implementation_choices", key, sha, result)
     checked = changes.coverage(store, task_id)
     with store.transaction() as db:
