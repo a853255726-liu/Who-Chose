@@ -27,7 +27,7 @@ function card(item) {
   toggle.append(head, el('p', 'card-reason', item.reason)); article.append(toggle);
   if (open) {
     const region = el('div', 'expanded-region');
-    for (const [label, value] of [['对使用体验的影响', item.impact], [item.detail_label, item.detail]]) {
+    for (const [label, value] of [['实现后的行为', item.impact], [item.detail_label, item.detail], ['这个选择意味着什么', item.meaningful_difference]]) {
       if (!value) continue;
       const section = el('div'); section.append(el('div', 'detail-label', label), el('div', 'detail-text', value)); region.append(section);
     }

@@ -7,6 +7,19 @@ Read [shared criteria](../references/decision-criteria.md). Start the task basel
 
 Review from the user's task: identify the situation, user action, and actual result before classifying the supporting diff. Use functional names for `functional_block_name`; write `title`, `user_visible_consequence`, and `meaningful_difference` so the user can judge the delivered behavior without understanding the code. Describe only what this task actually implements and preserve its material limits.
 
+Keep the decision fields distinct:
+
+| Field | What to write |
+| --- | --- |
+| `title` | A short, concrete behavior choice the user can recognize, including a consequential limit when needed. |
+| `user_visible_consequence` | What happens in the relevant situation: the user's action, the resulting behavior, and any material restriction or failure outcome. Keep function names, flags and internal call order in supporting evidence. |
+| `rationale` | The actual basis for selecting this option at the recorded time: the relevant goal or constraint, why it favored this option, and a material cost if one was considered. A description of the implemented behavior is not itself a reason. Preserve the rationale provenance rules below. |
+| `meaningful_difference` | How this choice affects use compared with a meaningful alternative: what becomes easier, harder, unavailable or risky, and which tradeoff matters for the user's task. Keep this separate from both the behavior description and the historical reason. |
+
+For example, prefer `title` “分类由自己填写，不自动判断” over “增加 category 参数”. Its consequence can explain that users may type a category, with no preset list, automatic classification or synonym merging. Its meaningful difference can explain that free entry accommodates personal categories, while names such as “吃饭” and “餐饮” may need reconciliation for later statistics. If the AI actually chose this to avoid maintaining a preset list, record that basis and its tradeoff when choosing; do not infer that historical motive from the code. These are field-writing examples, not requirements to implement those features.
+
+Use concise, task-specific language. Avoid vague benefits such as “improves the experience”, unsupported claims about speed or user outcomes, and repeating the same behavior in every field. Do not append a generic review instruction, a WhoChose promotional sentence or a confirmation question to every difference. User quotations and source classifications remain evidence, not copy to rewrite for readability.
+
 For example, a duplicate-record feature can be titled “疑似重复时默认取消，输入‘仍要保存’后才新增”, with the matching rule and recovery behavior explained in its consequence. A helper, an `allow_duplicate` parameter, or where validation runs is supporting evidence or an ordinary adjustment unless it creates a distinct material user consequence. Several functions serving that one behavior do not each require a decision card. Keep materially different behavior rules and provenance separate within the functional block.
 
 When delivering the review, describe implemented functions and important behavior differences first, followed by the relevant checks and concrete gaps affecting use. Put code locations and design rationale in supporting detail. Do not substitute a list of functions, internal safeguards, test counts, or recorded hunks for the user's functional result; do not add a review round solely to follow these instructions.

@@ -37,9 +37,11 @@ def markdown(data):
         lines.extend(["## " + md_text(block["name"]), ""])
         for item in block["decisions"]:
             lines.extend(["### " + md_text(item["title"]), "", md_text(item["label"]), "", md_text(item["reason"]), "",
-                md_text(item["impact"]), ""])
+                "实现后的行为：" + md_text(item["impact"]), ""])
             if item["detail"]:
                 lines.extend([md_text(item["detail_label"]) + "：" + md_text(item["detail"]), ""])
+            if item.get("meaningful_difference"):
+                lines.extend(["这个选择意味着什么：" + md_text(item["meaningful_difference"]), ""])
         if block["ordinary_changes"]:
             lines.extend(["<details><summary>其他调整</summary>", ""])
             for group in block["ordinary_changes"]:
